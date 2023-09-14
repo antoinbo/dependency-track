@@ -63,6 +63,7 @@ public enum ConfigPropertyConstants {
     VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ENABLED("vuln-source", "github.advisories.enabled", "false", PropertyType.BOOLEAN, "Flag to enable/disable GitHub Advisories"),
     VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ALIAS_SYNC_ENABLED("vuln-source", "github.advisories.alias.sync.enabled", "true", PropertyType.BOOLEAN, "Flag to enable/disable alias synchronization for GitHub Advisories"),
     VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ACCESS_TOKEN("vuln-source", "github.advisories.access.token", null, PropertyType.STRING, "The access token used for GitHub API authentication"),
+    VULNERABILITY_SOURCE_GITHUB_ADVISORIES_API_URL("vuln-source", "github.advisories.api.url", "https://api.github.com/graphql", PropertyType.STRING, "A base URL pointing to the hostname and path of the GitHub API"),
     VULNERABILITY_SOURCE_GOOGLE_OSV_BASE_URL("vuln-source", "google.osv.base.url", "https://osv-vulnerabilities.storage.googleapis.com/", PropertyType.URL, "A base URL pointing to the hostname and path for OSV mirroring"),
     VULNERABILITY_SOURCE_GOOGLE_OSV_ENABLED("vuln-source", "google.osv.enabled", null, PropertyType.STRING, "List of enabled ecosystems to mirror OSV"),
     VULNERABILITY_SOURCE_GOOGLE_OSV_ALIAS_SYNC_ENABLED("vuln-source", "google.osv.alias.sync.enabled", "false", PropertyType.BOOLEAN, "Flag to enable/disable alias synchronization for OSV"),

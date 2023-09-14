@@ -67,6 +67,7 @@ import java.util.Set;
 
 import static org.dependencytrack.model.ConfigPropertyConstants.VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ACCESS_TOKEN;
 import static org.dependencytrack.model.ConfigPropertyConstants.VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ALIAS_SYNC_ENABLED;
+import static org.dependencytrack.model.ConfigPropertyConstants.VULNERABILITY_SOURCE_GITHUB_ADVISORIES_API_URL;
 import static org.dependencytrack.model.ConfigPropertyConstants.VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ENABLED;
 
 public class GitHubAdvisoryMirrorTask implements LoggableSubscriber {
@@ -74,10 +75,10 @@ public class GitHubAdvisoryMirrorTask implements LoggableSubscriber {
     private static final Logger LOGGER = Logger.getLogger(GitHubAdvisoryMirrorTask.class);
     private static final PebbleEngine ENGINE = new PebbleEngine.Builder().build();
     private static final PebbleTemplate TEMPLATE = ENGINE.getTemplate("templates/github/securityAdvisories.peb");
-    private static final String GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
 
     private final boolean isEnabled;
     private final boolean isAliasSyncEnabled;
+    private String apiGraphqlUrl;
     private String accessToken;
     private boolean mirroredWithoutErrors = true;
 
@@ -87,11 +88,16 @@ public class GitHubAdvisoryMirrorTask implements LoggableSubscriber {
             this.isEnabled = enabled != null && Boolean.parseBoolean(enabled.getPropertyValue());
 
             final ConfigProperty aliasSyncEnabled = qm.getConfigProperty(VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ALIAS_SYNC_ENABLED.getGroupName(), VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ALIAS_SYNC_ENABLED.getPropertyName());
-            isAliasSyncEnabled = aliasSyncEnabled != null && Boolean.parseBoolean(aliasSyncEnabled.getPropertyValue());
+            this.isAliasSyncEnabled = aliasSyncEnabled != null && Boolean.parseBoolean(aliasSyncEnabled.getPropertyValue());
 
             final ConfigProperty accessToken = qm.getConfigProperty(VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ACCESS_TOKEN.getGroupName(), VULNERABILITY_SOURCE_GITHUB_ADVISORIES_ACCESS_TOKEN.getPropertyName());
             if (accessToken != null) {
                 this.accessToken = accessToken.getPropertyValue();
+            }
+
+            final ConfigProperty apiUrl = qm.getConfigProperty(VULNERABILITY_SOURCE_GITHUB_ADVISORIES_API_URL.getGroupName(), VULNERABILITY_SOURCE_GITHUB_ADVISORIES_API_URL.getPropertyName());
+            if (apiUrl != null) {
+                this.apiGraphqlUrl = apiUrl.getPropertyValue();
             }
         }
     }
@@ -101,7 +107,7 @@ public class GitHubAdvisoryMirrorTask implements LoggableSubscriber {
      */
     public void inform(final Event e) {
         if (e instanceof GitHubAdvisoryMirrorEvent && this.isEnabled) {
-            if (this.accessToken != null) {
+            if (this.accessToken != null && this.apiGraphqlUrl != null) {
                 final long start = System.currentTimeMillis();
                 LOGGER.info("Starting GitHub Advisory mirroring task");
                 try {
@@ -136,7 +142,7 @@ public class GitHubAdvisoryMirrorTask implements LoggableSubscriber {
 
     private void retrieveAdvisories(final String advisoriesEndCursor) throws IOException {
         final String queryTemplate = generateQueryTemplate(advisoriesEndCursor);
-        HttpPost request = new HttpPost(GITHUB_GRAPHQL_URL);
+        HttpPost request = new HttpPost(this.apiGraphqlUrl);
         request.addHeader("Authorization", "bearer " + accessToken);
         request.addHeader("content-type", "application/json");
         request.addHeader("accept", "application/json");
