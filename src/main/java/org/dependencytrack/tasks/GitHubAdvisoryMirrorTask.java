@@ -99,6 +99,16 @@ public class GitHubAdvisoryMirrorTask implements LoggableSubscriber {
             if (apiUrl != null) {
                 this.apiGraphqlUrl = apiUrl.getPropertyValue();
             }
+            // if (apiUrl != null && ConfigProperty.PropertyType.STRING == apiUrl.getPropertyType()) {
+            //     String apiUrlValue = apiUrl.getPropertyValue();
+            //     if (apiUrlValue.endsWith("/")) {
+            //         apiUrlValue = apiUrlValue.substring(0, apiUrlValue.length()-1);
+            //     }
+            //     this.apiGraphqlUrl = apiUrlValue + "/graphql";
+            // } else {
+            //     LOGGER.warn("Configuration value of GitHub Advisory API URL is null or type is not string. Use default value.");
+            //     this.apiGraphqlUrl = apiUrl.getDefaultPropertyValue() + "/graphql";
+            // }
         }
     }
 
